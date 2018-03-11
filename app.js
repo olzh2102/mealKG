@@ -23,7 +23,7 @@ const ItemCtrl = (function(){
 	// Public methods
 	return {
 		getItems: function() {
-			return data.items
+			return data.items;
 		},
 
 		addItem: function(name, calories) {
@@ -43,6 +43,8 @@ const ItemCtrl = (function(){
 
 			 // Add to items array
 			data.items.push(newItem);
+
+      return newItem;
 		},
 
 		logData: function() {
@@ -55,7 +57,7 @@ const ItemCtrl = (function(){
 
 const UICtrl = (function(){
 	const UISelectors = {
-		itemList: 'item-list',
+		itemList: '#item-list',
 		addBtn: '.add-btn',
 		itemNameInput: '#item-name',
 		itemCaloriesInput: '#item-calories'
@@ -66,7 +68,7 @@ const UICtrl = (function(){
 		populateItemList: function(items) {
 			let html = '';
 
-			items.forEach(item => {
+			items.forEach(function(item) {
 				html += `<li class="collection-item" id="item-${item.id}">
 					<strong>${item.name}: </strong> <em>${item.calories} Calories</em>
 					<a href="#" class="edit-item secondary-content"><i class="fa fa-pencil"></i></a>
@@ -74,7 +76,7 @@ const UICtrl = (function(){
 			});
 
 			// Insert list item
-			document.getElementById(UISelectors.itemList).innerHTML = html;
+			document.querySelector(UISelectors.itemList).innerHTML = html;
 		},
 
 		getItemInput: function() {
@@ -82,6 +84,19 @@ const UICtrl = (function(){
 				name: document.querySelector(UISelectors.itemNameInput).value,
 				calories: document.querySelector(UISelectors.itemCaloriesInput).value
 			}
+		},
+
+		addListItem: function(item) {
+			// Create li element
+			const li = document.createElement('li');
+			// Add class
+			li.className = 'collection-item';
+			// Add ID
+			li.id = `item-${item.id}`;
+			// Add HTML
+			li.innerHTML = `<strong>${item.name}: </strong> <em>${item.calories} Calories</em><a href="#" class="edit-item secondary-content"><i class="fa fa-pencil"></i></a>`;
+			// Insert item
+			document.querySelector(UISelectors.itemList).insertAdjacentElement('beforeend', li);
 		},
 
 		getSelectors: function() {
@@ -94,7 +109,7 @@ const UICtrl = (function(){
 
 const App = (function(ItemCtrl, UICtrl){
 	// Load event listeners
-	const loadEventListeners = () => {
+	const loadEventListeners = function() {
 		// Get UI Selectors
 		const UISelectors = UICtrl.getSelectors();
 
@@ -103,7 +118,7 @@ const App = (function(ItemCtrl, UICtrl){
 	}
 
 	// Add item submit
-	const itemAddSubmit = e => {
+	const itemAddSubmit = function(e) {
 		e.preventDefault();
 
 		// Get form input from UI Controller
@@ -113,6 +128,8 @@ const App = (function(ItemCtrl, UICtrl){
 		if(input.name !== '' && input.calories !== '') {
 			// Add item
 			const newItem = ItemCtrl.addItem(input.name, input.calories);
+			// Add item to UI list
+			UICtrl.addListItem(newItem);
 		}
 	}
 
