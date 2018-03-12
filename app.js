@@ -1,5 +1,46 @@
 // -------- Storage Controller --------
 
+const StorageCtrl = (function() {
+	// Public methods
+	return {
+		storeItem: function(item) {
+			let items;
+
+			// Check if any items in LS 
+			if(localStorage.getItem('items') === null) {
+				items = [];
+
+				// Push new item
+				items.push(item);
+				// Set LS 
+				localStorage.setItem('items', JSON.stringify(items));
+			} else {
+
+				// Get what is already in LS 
+				items = JSON.parse(localStorage.getItem('items'));
+
+				// Push new item 
+				items.push(item);
+
+				// Re set LS 
+				localStorage.setItem('items', JSON.stringify(items));
+			}
+		},
+
+		getItemsFromStorage: function() {
+			let items;
+
+			if(localStorage.getItem('items') === null) {
+				items = [];
+			} else {
+				items = JSON.parse(localStorage.getItem('items'));
+			}
+
+			return items;
+		}
+	}
+})();
+
 // -------- Item Controller --------
 
 const ItemCtrl = (function(){
@@ -12,11 +53,13 @@ const ItemCtrl = (function(){
 
 	// Data Structure / State
 	const data = {
-		items: [
-			// {id: 0, name: 'Steak Dinner', calories: 3000},
-			// 			{id: 1, name: 'Doner Kebab', calories: 1200},
-			//-			{id: 2, name: 'Ice Cream', calories: 600},
-		],
+		//  items: [
+		// // 	// {id: 0, name: 'Steak Dinner', calories: 3000},
+		// // 	// 			{id: 1, name: 'Doner Kebab', calories: 1200},
+		// // 	//-			{id: 2, name: 'Ice Cream', calories: 600},
+		//  ],
+
+		items: StorageCtrl.getItemsFromStorage(),
 		currentItem: null,
 		totalCalories: 0
 	}
@@ -255,7 +298,7 @@ const UICtrl = (function(){
 
 // -------- App Controller --------
 
-const App = (function(ItemCtrl, UICtrl){
+const App = (function(ItemCtrl, StorageCtrl, UICtrl){
 	// Load event listeners
 	const loadEventListeners = function() {
 		// Get UI Selectors
@@ -309,6 +352,9 @@ const App = (function(ItemCtrl, UICtrl){
 			// Add total calories to the UI 
 			UICtrl.showTotalCalories(totalCalories);
 
+			// Store it in LS 
+			StorageCtrl.storeItem(newItem);
+
 			// Clear fields once add meal pressed 
 			UICtrl.clearInput();
 
@@ -318,7 +364,7 @@ const App = (function(ItemCtrl, UICtrl){
 	// Edit item on click    
 	const itemEditClick = function(e) {
 		e.preventDefault();
-		
+
 		if(e.target.classList.contains('edit-item')) {
 			// Get list item id (item-0, item-1)
 			const listId = e.target.parentNode.parentNode.id;
@@ -427,7 +473,7 @@ const App = (function(ItemCtrl, UICtrl){
 			loadEventListeners();
 		}
 	}
-})(ItemCtrl, UICtrl);
+})(ItemCtrl, StorageCtrl, UICtrl);
 
 // Initialise the app
 App.init();
